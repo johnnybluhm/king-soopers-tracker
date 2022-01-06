@@ -1,0 +1,122 @@
+[
+  ElementHandle {
+    _disposed: false,
+    _context: ExecutionContext {
+      _client: [CDPSession],
+      _world: [DOMWorld],
+      _contextId: 12,
+      _contextName: ''
+    },
+    _client: CDPSession {
+      eventsMap: [Map],
+      emitter: [Object],
+      _callbacks: Map {},
+      _connection: [Connection],
+      _targetType: 'page',
+      _sessionId: '75DA11706DFA98FB3DC5E2373A54B242'
+    },
+    _remoteObject: {
+      type: 'object',
+      subtype: 'node',
+      className: 'HTMLAnchorElement',
+      description: 'a.kds-Link.kds-Link--m.ml-4.w-full.m-auto.lg:pt-4.lg:mt-1.lg:flex-1.lg:text-right',
+      objectId: '-8280876277967958216.12.3'
+    },
+    _page: Page {
+      eventsMap: Map {},
+      emitter: [Object],
+      _closed: false,
+      _timeoutSettings: [TimeoutSettings],
+      _pageBindings: Map {},
+      _javascriptEnabled: true,
+      _workers: [Map],
+      _fileChooserInterceptors: Set {},
+      _userDragInterceptionEnabled: false,
+      _handlerMap: [WeakMap],
+      _client: [CDPSession],
+      _target: [Target],
+      _keyboard: [Keyboard],
+      _mouse: [Mouse],
+      _touchscreen: [Touchscreen],
+      _accessibility: [Accessibility],
+      _frameManager: [FrameManager],
+      _emulationManager: [EmulationManager],
+      _tracing: [Tracing],
+      _coverage: [Coverage],
+      _screenshotTaskQueue: [TaskQueue],
+      _viewport: null
+    },
+    _frameManager: FrameManager {
+      eventsMap: [Map],
+      emitter: [Object],
+      _frames: [Map],
+      _contextIdToContext: [Map],
+      _isolatedWorlds: [Set],
+      _client: [CDPSession],
+      _page: [Page],
+      _networkManager: [NetworkManager],
+      _timeoutSettings: [TimeoutSettings],
+      _mainFrame: [Frame]
+    }
+  },
+  ElementHandle {
+    _disposed: false,
+    _context: ExecutionContext {
+      _client: [CDPSession],
+      _world: [DOMWorld],
+      _contextId: 12,
+      _contextName: ''
+    },
+    _client: CDPSession {
+      eventsMap: [Map],
+      emitter: [Object],
+      _callbacks: Map {},
+      _connection: [Connection],
+      _targetType: 'page',
+      _sessionId: '75DA11706DFA98FB3DC5E2373A54B242'
+    },
+    _remoteObject: {
+      type: 'object',
+      subtype: 'node',
+      className: 'HTMLAnchorElement',
+      description: 'a.kds-Link.kds-Link--m.ml-4.w-full.m-auto.lg:pt-4.lg:mt-1.lg:flex-1.lg:text-right',
+      objectId: '-8280876277967958216.12.4'
+    },
+    _page: Page {
+      eventsMap: Map {},
+      emitter: [Object],
+      _closed: false,
+      _timeoutSettings: [TimeoutSettings],
+      _pageBindings: Map {},
+      _javascriptEnabled: true,
+      _workers: [Map],
+      _fileChooserInterceptors: Set {},
+      _userDragInterceptionEnabled: false,
+      _handlerMap: [WeakMap],
+      _client: [CDPSession],
+      _target: [Target],
+      _keyboard: [Keyboard],
+      _mouse: [Mouse],
+      _touchscreen: [Touchscreen],
+      _accessibility: [Accessibility],
+      _frameManager: [FrameManager],
+      _emulationManager: [EmulationManager],
+      _tracing: [Tracing],
+      _coverage: [Coverage],
+      _screenshotTaskQueue: [TaskQueue],
+      _viewport: null
+    },
+    _frameManager: FrameManager {
+      eventsMap: [Map],
+      emitter: [Object],
+      _frames: [Map],
+      _contextIdToContext: [Map],
+      _isolatedWorlds: [Set],
+      _client: [CDPSession],
+      _page: [Page],
+      _networkManager: [NetworkManager],
+      _timeoutSettings: [TimeoutSettings],
+      _mainFrame: [Frame]
+    }
+  }
+]
