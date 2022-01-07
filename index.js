@@ -1,7 +1,7 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const fs = require("fs");
-/*const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin())*/
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin())
 
 const start = async () => {
   deleteOldScreenshots();
@@ -18,24 +18,31 @@ const start = async () => {
 
   const res = await Promise.all([page.click("#SignIn-submitButton"), page.waitForNavigation()])
 
-  
   //await page.screenshot({ path: './screenshots/afterNav.png' })
-
-  /*while(page.$("#SignIn-submitButton")!=null){
-    await Promise.all([page.click("#SignIn-submitButton"), page.waitForNavigation()])
-  }*/
 
   await page.goto('https://www.kingsoopers.com/mypurchases');
 
-  const links = await page.$$eval('a[data-testid="order-details-link"]', (anchors) =>{
+  const links = await page.$$eval('a[data-testid="order-details-link"]', async (anchors) =>{
     return anchors.map(anchor => anchor.href);
   });
-
-  links.forEach((a)=>{
-    console.log(a);
+  var newPagePromises = new Array();
+  links.forEach(()=>{
+    newPagePromises.push(browser.newPage())
   })
 
-  console.log(links);
+  const emptyPages = await Promise.all(newPagePromises);  
+
+  var pageGotoPromises = [];
+  emptyPages.forEach((orderPage, index) => {
+    pageGotoPromises.push(orderPage.goto(links[index]))
+  })
+
+  const orderPages = await Promise.all(pageGotoPromises)
+
+  var screenShotPromises = new Array()
+  orderPages.forEach((orderPage, index) => {
+    screenShotPromises.push(orderPage.screenshot({path: `./screenshots/order${index}.png`}))
+  })  
 
   await browser.close();
 }
