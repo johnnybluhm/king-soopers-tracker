@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const fs = require("fs");
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin())
 puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
 
@@ -8,8 +9,8 @@ const start = async (delete_) => {
   if(delete_){
     deleteOldOrders();
   }  
-
-  const browser = await puppeteer.launch({headless: false});
+  //const options = {executablePath: 'C:\Program Files (x86)\Google\Chrome\Application', headless: false}
+  const browser = await puppeteer.launch();
   const page = (await browser.pages())[0];
 
   page.on('dialog', async dialog => {
@@ -19,7 +20,7 @@ const start = async (delete_) => {
 
   await page.goto('https://www.kingsoopers.com/signin/');
 
-  await page.screenshot({ path: './screenshots/initialLogin.png' })
+  //await page.screenshot({ path: './screenshots/initialLogin.png' })
 
   await page.type("#SignIn-emailInput", "jon.the.bon.bon@gmail.com")
   await page.type("#SignIn-passwordInput", "hFvGf6uV_P#FwyF")
