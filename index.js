@@ -2,15 +2,24 @@ const puppeteer = require('puppeteer-extra');
 const fs = require("fs");
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin())
+puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
 
-const start = async () => {
-  deleteOldScreenshots();
+const start = async (delete_) => {
+  if(delete_){
+    deleteOldOrders();
+  }  
+
   const browser = await puppeteer.launch({headless: false});
   const page = (await browser.pages())[0];
 
+  page.on('dialog', async dialog => {
+    console.log(dialog.message());
+    await dialog.dismiss();
+	});
+
   await page.goto('https://www.kingsoopers.com/signin/');
 
-  //await page.screenshot({ path: './screenshots/initialLogin.png' })
+  await page.screenshot({ path: './screenshots/initialLogin.png' })
 
   await page.type("#SignIn-emailInput", "jon.the.bon.bon@gmail.com")
   await page.type("#SignIn-passwordInput", "hFvGf6uV_P#FwyF")
@@ -34,43 +43,35 @@ const start = async () => {
 
   var pageGotoPromises = [];
   emptyPages.forEach((orderPage, index) => {
-    pageGotoPromises.push(orderPage.goto(links[index]))
+    pageGotoPromises.push(orderPage.goto(links[index],{waitUntil: 'domcontentloaded'} ))
   })
 
   const orderPages = await Promise.all(pageGotoPromises)
 
-  var screenShotPromises = new Array()
-  orderPages.forEach((orderPage, index) => {
-    screenShotPromises.push(orderPage.screenshot({path: `./screenshots/order${index}.png`}))
+  var orderSelectPromises = new Array()
+  orderPages.forEach((orderPage) => {
+    orderSelectPromises.push(orderPage.$$('div.PH-ProductCard-container.w-full.p-16'))
+    console.log(orderSelectPromises)
   })  
-
+  const orders = await Promise.all(orderSelectPromises)
+  orders.forEach((order, num)=>{
+    var orderString = JSON.stringify(order)
+    fs.write(`./orders/orders/order-${num}`, orderString)
+  })
   await browser.close();
 }
 
-const google = async () => {
-  const browser = await puppeteer.launch({headless: false});
-  const page = await browser.newPage();
-  //await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36')
-  await page.goto('https://www.google.com');
-  await page.screenshot({ path: 'initialgoogle.png' })
-
-  await page.type("input.gLFyf.gsfi", "jon.the.bon.bon@gmail.com")
-  await page.screenshot({ path: 'googleTyped.png' })
-  await Promise.all([page.click("div.FPdoLc.lJ9FBc input.gNO89b"), page.waitForNavigation({waitUntil: 'networkidle2'})])
-  await page.screenshot({ path: 'afterLogin.png' })
-  //await browser.close();
-}
-const deleteOldScreenshots = () => {
-  const dir = "screenshots"
+const deleteOldOrders = () => {
+  const dir = "orders"
   try {
     fs.rmdirSync(dir, { recursive: true });
     console.log(`${dir} dir deleted!`);
-    fs.mkdirSync("screenshots")
+    fs.mkdirSync("orders")
     console.log(`fresh ${dir} dir created!`);
 } catch (err) {
     console.error(`Error while deleting ${dir}.`);
 }
 }
 
-//google();
-start();
+
+start(true)
