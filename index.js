@@ -5,49 +5,32 @@ const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin())
 puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
 
+const path = require('path');
+
 const start = async (delete_) => {
   if(delete_){
     deleteOldOrders();
   }  
-  //const options = {executablePath: 'C:\Program Files (x86)\Google\Chrome\Application', headless: false}
-  const browser = await puppeteer.launch();
-  const page = (await browser.pages())[0];
+  const browser = await getBrowser();
+  const initialPage = await getInitialPage();
+  await navigateToMyPurchases();  
 
-  page.on('dialog', async dialog => {
-    console.log(dialog.message());
-    await dialog.dismiss();
-	});
-
-  await page.goto('https://www.kingsoopers.com/signin/');
-
-  //await page.screenshot({ path: './screenshots/initialLogin.png' })
-
-  await page.type("#SignIn-emailInput", "jon.the.bon.bon@gmail.com")
-  await page.type("#SignIn-passwordInput", "hFvGf6uV_P#FwyF")
-  //await page.screenshot({ path: './screenshots/loginafterTyping.png' })
-
-  const res = await Promise.all([page.click("#SignIn-submitButton"), page.waitForNavigation()])
-
-  //await page.screenshot({ path: './screenshots/afterNav.png' })
-
-  await page.goto('https://www.kingsoopers.com/mypurchases');
-
-  const links = await page.$$eval('a[data-testid="order-details-link"]', async (anchors) =>{
+  const orderDetailsLinks = await initialPage.$$eval('a[data-testid="order-details-link"]', async (anchors) =>{
     return anchors.map(anchor => anchor.href);
   });
+
   var newPagePromises = new Array();
-  links.forEach(()=>{
+  orderDetailsLinks.forEach(()=>{
     newPagePromises.push(browser.newPage())
   })
-
-  const emptyPages = await Promise.all(newPagePromises);  
+  const orderPages = await Promise.all(newPagePromises);  
 
   var pageGotoPromises = [];
-  emptyPages.forEach((orderPage, index) => {
-    pageGotoPromises.push(orderPage.goto(links[index],{waitUntil: 'domcontentloaded'} ))
+  orderPages.forEach((orderPage, index) => {
+    pageGotoPromises.push(orderPage.goto(orderDetailsLinks[index],{waitUntil: 'domcontentloaded'} ))
   })
 
-  const orderPages = await Promise.all(pageGotoPromises)
+  await Promise.all(pageGotoPromises)
 
   var orderSelectPromises = new Array()
   orderPages.forEach((orderPage) => {
@@ -56,11 +39,46 @@ const start = async (delete_) => {
   })  
   const orders = await Promise.all(orderSelectPromises)
   orders.forEach((order, num)=>{
-    var orderString = JSON.stringify(order)
-    fs.write(`./orders/orders/order-${num}`, orderString)
+    var itemString = "";
+    order.forEach((item)=> {
+      itemString +=`${item}+\n`
+    })
+    fs.write(`./orders/order-${num}`, itemString)
   })
   await browser.close();
+
+  //HELPER CLOSURES:
+
+  const getBrowser = async () => {
+    const browser_path = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+    const options = {executablePath: browser_path, headless: false}
+    const browser = await puppeteer.launch(options);
+    return browser;
+  }
+  
+  const getInitialPage = async () => {
+    
+    const page = (await browser.pages())[0];
+    /*page.on('dialog', async dialog => {
+      console.log(dialog.message());
+      await dialog.dismiss();
+    });*/
+  
+    await page.goto('https://www.kingsoopers.com/signin/');
+  }
+
+  const navigateToMyPurchases = async () => {
+    
+  await initialPage.type("#SignIn-emailInput", "jon.the.bon.bon@gmail.com")
+  await initialPage.type("#SignIn-passwordInput", "hFvGf6uV_P#FwyF")
+
+  await Promise.all([initialPage.click("#SignIn-submitButton"), initialPage.waitForNavigation()])
+
+  await initialPage.goto('https://www.kingsoopers.com/mypurchases');
+  }
 }
+
+
 
 const deleteOldOrders = () => {
   const dir = "orders"
