@@ -6,6 +6,12 @@ Thius endpont should be able to get the shit we need to make the requests to the
 the header cookie: and the put all the request info in there sepeated by semi colons So we can
 Maybe just sign in a user, then get their cookie and use that for awhile
 
+
+how to "scrape" data successfully:
 need to log in to get cookies. Then need to serialize cookies, and put it in header for api. 
 Then call https://www.kingsoopers.com/mypurchases/api/v1/receipt/summary/by-user-id to get the recepit ids that I can use to later get the 
 order details from using the same cookie header as before.
+
+
+
+cookie
