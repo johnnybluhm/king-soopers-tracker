@@ -3,15 +3,11 @@ const fs = require("fs");
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin())
-puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
+//puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
 
 const start = async (delete_) => {
     if (delete_) {
         deleteOldOrders();
-    }
-    var context = {
-        browser : null,
-        intialPage : null,
     }
     const browser = await getBrowser();
     const initialPage = await getInitialPage();
@@ -32,19 +28,15 @@ const start = async (delete_) => {
     //HELPER CLOSURES:
     async function getBrowser() {
         const browser_path = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
-        //const options = { executablePath: browser_path, headless: false }
-        const browser = await puppeteer.launch({headless:false});
+        const firefox_path = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+        const options = { executablePath: browser_path, headless: false, product: 'chrome' }
+        const browser = await puppeteer.launch(options);
         return browser;
     }
 
     async function getInitialPage() {
 
         const page = (await browser.pages())[0];
-        /*page.on('dialog', async dialog => {
-          console.log(dialog.message());
-          await dialog.dismiss();
-        });*/
-    
         await page.goto('https://www.kingsoopers.com/signin/');
     
         return page;
@@ -58,14 +50,13 @@ const start = async (delete_) => {
         await Promise.all([initialPage.click("#SignIn-submitButton"), initialPage.waitForNavigation()])
     
         await initialPage.goto('https://www.kingsoopers.com/mypurchases');
-    
-        return initialPage;
+
+        let purchasesPage = initialPage;
+        return purchasesPage;
     }
 
     async function getOrderPageLinks() {
-        return await purchasesPage.$$eval('a[data-testid="order-details-link"]', async (anchors) => {
-            return await anchors.map(anchor => anchor.href);
-        });
+        return await purchasesPage.$$eval('a[data-testid="order-details-link"]', anchors => anchors.map(anchor => anchor.href));
     }
     
     async function createOrderPages(){
@@ -132,4 +123,50 @@ const deleteOldOrders = () => {
     }
 }
 
-start(true)
+
+async function getRequests(){
+
+    const browser = await getBrowser();
+    const initialPage = await getInitialPage();
+    await signIn();
+
+
+    async function getBrowser() {
+        //const browser_path = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+        //const options = { executablePath: browser_path, headless: false, product: 'chrome' }
+        const browser = await puppeteer.launch({headless: false});
+        return browser;
+    }
+
+    async function getInitialPage() {
+
+        const page = (await browser.pages())[0];
+        await page.goto('https://www.kingsoopers.com/signin/');
+        page.on('response', logRequest)
+        return page;
+    }
+
+    async function signIn(){
+        await initialPage.type("#SignIn-emailInput", "jon.the.bon.bon@gmail.com")
+        await initialPage.type("#SignIn-passwordInput", "hFvGf6uV_P#FwyF")    
+        await Promise.all([initialPage.click("#SignIn-submitButton"), initialPage.waitForNavigation()])
+    }
+}
+
+async function logRequest(interceptedRequest) {
+    if(interceptedRequest.url() == "https://www.kingsoopers.com/products/api/products/details-basic"){
+        console.log('A request was made:', interceptedRequest.url());
+        const data = await interceptedRequest.json();
+        console.log(data);
+        writeJsonToDisk(data);
+    }
+}
+
+async function writeJsonToDisk(data){
+    const str = JSON.stringify(data)
+    const time = new Date();
+    
+    await fs.writeFile(`./orders/order-${time.toDateString()}`, str)
+}
+
+getRequests();

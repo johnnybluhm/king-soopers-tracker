@@ -1,0 +1,11 @@
+Api method was post https://www.kingsoopers.com/atlas/v1/purchase-history/details 
+I got the body from the actual web page request at https://www.kingsoopers.com/mypurchases/detail/620~00055~2022-01-10~504~2232106
+
+
+Thius endpont should be able to get the shit we need to make the requests to the other endpoints. Alot of data is sent via the cookie. They put
+the header cookie: and the put all the request info in there sepeated by semi colons So we can
+Maybe just sign in a user, then get their cookie and use that for awhile
+
+need to log in to get cookies. Then need to serialize cookies, and put it in header for api. 
+Then call https://www.kingsoopers.com/mypurchases/api/v1/receipt/summary/by-user-id to get the recepit ids that I can use to later get the 
+order details from using the same cookie header as before.
