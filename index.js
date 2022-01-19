@@ -1,9 +1,10 @@
 const puppeteer = require('puppeteer');
 const fs = require("fs");
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { executablePath } = require('puppeteer');
 //puppeteer.use(StealthPlugin())
 //puppeteer.use(require('puppeteer-extra-plugin-anonymize-ua')())
+
+getOrders();
 
 async function getOrders(){
 
@@ -62,4 +63,3 @@ async function writeJsonToDisk(purchaseHistory){
       });
 }
 
-getOrders();
